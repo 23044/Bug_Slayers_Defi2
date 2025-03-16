@@ -5,6 +5,11 @@ import { SignupPage } from "./components/SignupPage";
 import { Navigation } from "./components/Navigation";
 import Stats from "./components/Stats";
 import Banner from "./components/Banner";
+import TopContributors from "./components/TopContributors";
+import HowItWorks from "./components/HowItWorks";
+
+import "./index.css";
+
 import {
   Search,
   Award,
@@ -281,7 +286,7 @@ function HomePage() {
                 Contribuer au challenge
               </button>
             </div>
-
+            <TopContributors />
             {/* Tools */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-bold mb-4">Outils</h3>
@@ -321,6 +326,7 @@ function HomePage() {
             </div>
           </div>
         </div>
+        <HowItWorks />
       </div>
     </>
   );
