@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier le Profil - Hassaniya Project{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h2 class="text-center mb-4">Modifier le Profil</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="username" class="form-label">Nom d'utilisateur</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+        {% if request.user.is_staff %}
+        <div class="mb-3">
+            <label for="role" class="form-label">Rôle</label>
+            <select class="form-select" id="role" name="role">
+                <option value="user" {% if not user.is_staff and not user.is_superuser %}selected{% endif %}>Utilisateur</option>
+                <option value="staff" {% if user.is_staff and not user.is_superuser %}selected{% endif %}>Staff</option>
+                <option value="admin" {% if user.is_superuser %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+        {% endif %}
+        <div class="mb-3">
+            <label for="new_password" class="form-label">Nouveau mot de passe (optionnel)</label>
+            <input type="password" class="form-control" id="new_password" name="new_password">
+        </div>
+        <div class="mb-3">
+            <label for="confirm_password" class="form-label">Confirmer le nouveau mot de passe</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+        </div>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+            <a href="{% if request.user.is_staff %}{% url 'user_list' %}{% else %}{% url 'profile' %}{% endif %}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

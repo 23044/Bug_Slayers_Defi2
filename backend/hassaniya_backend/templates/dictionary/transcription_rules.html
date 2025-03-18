@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Règles de Transcription - Dictionnaire Hassaniya{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">Règles de Transcription</h1>
+
+            <!-- Introduction -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5 card-title">Guide de transcription du Hassaniya</h2>
+                    <p class="card-text">
+                        Pour assurer une cohérence dans la transcription des mots hassaniya, veuillez suivre ces règles 
+                        de transcription. Ces règles permettent de représenter les sons du hassaniya en utilisant 
+                        l'alphabet latin de manière standardisée.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Consonnes -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">Consonnes</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Lettre arabe</th>
+                                    <th>Transcription</th>
+                                    <th>Exemple</th>
+                                    <th>Prononciation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ب</td>
+                                    <td>b</td>
+                                    <td>bâb (porte)</td>
+                                    <td>comme en français</td>
+                                </tr>
+                                <tr>
+                                    <td>ت</td>
+                                    <td>t</td>
+                                    <td>tâb (il s'est repenti)</td>
+                                    <td>comme en français</td>
+                                </tr>
+                                <tr>
+                                    <td>ث</td>
+                                    <td>th</td>
+                                    <td>thalj (neige)</td>
+                                    <td>comme le 'th' anglais dans 'think'</td>
+                                </tr>
+                                <tr>
+                                    <td>ج</td>
+                                    <td>j</td>
+                                    <td>jmal (chameau)</td>
+                                    <td>comme 'j' dans 'jour'</td>
+                                </tr>
+                                <tr>
+                                    <td>ح</td>
+                                    <td>ḥ</td>
+                                    <td>ḥût (poisson)</td>
+                                    <td>h aspiré</td>
+                                </tr>
+                                <tr>
+                                    <td>خ</td>
+                                    <td>kh</td>
+                                    <td>khubz (pain)</td>
+                                    <td>comme la 'jota' espagnole</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voyelles -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h3 class="h5 mb-0">Voyelles</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Signe arabe</th>
+                                    <th>Transcription</th>
+                                    <th>Exemple</th>
+                                    <th>Prononciation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>َ (fatha)</td>
+                                    <td>a</td>
+                                    <td>katab (il a écrit)</td>
+                                    <td>comme le 'a' de 'chat'</td>
+                                </tr>
+                                <tr>
+                                    <td>ِ (kasra)</td>
+                                    <td>i</td>
+                                    <td>bint (fille)</td>
+                                    <td>comme le 'i' de 'lit'</td>
+                                </tr>
+                                <tr>
+                                    <td>ُ (damma)</td>
+                                    <td>u</td>
+                                    <td>kutub (livres)</td>
+                                    <td>comme le 'ou' de 'bout'</td>
+                                </tr>
+                                <tr>
+                                    <td>ا (alif)</td>
+                                    <td>â</td>
+                                    <td>bâb (porte)</td>
+                                    <td>'a' long</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Règles spéciales -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h3 class="h5 mb-0">Règles spéciales</h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="h6">1. Sons emphatiques</h4>
+                    <ul class="mb-4">
+                        <li>ص : ṣ (s emphatique)</li>
+                        <li>ط : ṭ (t emphatique)</li>
+                        <li>ض : ḍ (d emphatique)</li>
+                        <li>ظ : ẓ (z emphatique)</li>
+                    </ul>
+
+                    <h4 class="h6">2. Hamza</h4>
+                    <ul class="mb-4">
+                        <li>Le hamza (ء) est transcrit par ' (apostrophe)</li>
+                        <li>Exemple : sa'al (il a demandé)</li>
+                    </ul>
+
+                    <h4 class="h6">3. Lettres solaires et lunaires</h4>
+                    <ul>
+                        <li>L'article "al" s'assimile devant les lettres solaires</li>
+                        <li>Exemple : ash-shams (le soleil) au lieu de al-shams</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Conseils pratiques -->
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="h5 mb-0">Conseils pratiques</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Utilisez un clavier avec les caractères spéciaux nécessaires</li>
+                        <li>Vérifiez la cohérence de votre transcription avec les mots existants</li>
+                        <li>En cas de doute, consultez les modérateurs</li>
+                        <li>Pour les variantes dialectales, indiquez la région entre parenthèses</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier le profil - {{ object.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Modifier le profil</h2>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Informations de base -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nom d'utilisateur</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ object.username }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ object.email }}" required>
+                        </div>
+                        
+                        <!-- Changement de mot de passe -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Changer le mot de passe</h5>
+                                <div class="mb-3">
+                                    <label for="new_password" class="form-label">Nouveau mot de passe</label>
+                                    <input type="password" class="form-control" id="new_password" name="new_password">
+                                    <div class="form-text">Laissez vide pour conserver le mot de passe actuel</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="confirm_password" class="form-label">Confirmer le mot de passe</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Gestion des rôles (admin uniquement) -->
+                        {% if request.user.is_staff %}
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Rôle utilisateur</h5>
+                                <div class="mb-3">
+                                    <select class="form-select" name="role" id="role">
+                                        <option value="user" {% if not object.is_staff and not object.is_superuser %}selected{% endif %}>Utilisateur</option>
+                                        <option value="staff" {% if object.is_staff and not object.is_superuser %}selected{% endif %}>Modérateur</option>
+                                        {% if request.user.is_superuser %}
+                                        <option value="admin" {% if object.is_superuser %}selected{% endif %}>Administrateur</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if object.is_active %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_active">Compte actif</label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Statistiques du profil -->
+                        {% if object.profile %}
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Statistiques</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <h6 class="mb-2">Mots contribués</h6>
+                                            <span class="h4">{{ object.profile.words_contributed }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <h6 class="mb-2">Points</h6>
+                                            <span class="h4">{{ object.profile.points }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <h6 class="mb-2">Niveau</h6>
+                                            <span class="h4">{{ object.profile.level }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'user_list' %}" class="btn btn-secondary">Retour</a>
+                            <div>
+                                {% if request.user.is_staff and not object.is_superuser %}
+                                <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    Supprimer le compte
+                                </button>
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+{% if request.user.is_staff and not object.is_superuser %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>{{ object.username }}</strong> ?</p>
+                <p class="text-danger">Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{% url 'delete_user' object.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

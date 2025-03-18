@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Guide de Contribution - Dictionnaire Hassaniya{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">Guide de Contribution</h1>
+            
+            <!-- Introduction -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5 card-title">Bienvenue dans notre projet collaboratif !</h2>
+                    <p class="card-text">
+                        Le dictionnaire Hassaniya est un projet collaboratif visant à préserver et documenter la richesse 
+                        de la langue hassaniya. Votre contribution est précieuse pour enrichir cette ressource.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Comment contribuer -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0">Comment contribuer ?</h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="h6">1. Soumettre un nouveau mot</h4>
+                    <ul class="mb-4">
+                        <li>Connectez-vous à votre compte</li>
+                        <li>Cliquez sur "Ajouter un mot" dans le menu principal</li>
+                        <li>Remplissez le formulaire avec :
+                            <ul>
+                                <li>Le mot en hassaniya</li>
+                                <li>Sa définition en français</li>
+                                <li>Un ou plusieurs exemples d'utilisation</li>
+                                <li>Le type de mot (racine ou dérivé)</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h4 class="h6">2. Points et niveaux</h4>
+                    <ul class="mb-4">
+                        <li>10 points pour chaque soumission</li>
+                        <li>50 points pour un mot dérivé approuvé</li>
+                        <li>100 points pour un mot racine approuvé</li>
+                        <li>2 points pour chaque vote reçu</li>
+                        <li>Un niveau gagné tous les 100 points</li>
+                    </ul>
+
+                    <h4 class="h6">3. Processus de validation</h4>
+                    <ul>
+                        <li>Chaque mot soumis est examiné par nos modérateurs</li>
+                        <li>Les mots approuvés sont ajoutés au dictionnaire</li>
+                        <li>En cas de rejet, vous pouvez soumettre une version corrigée</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Règles et bonnes pratiques -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h3 class="h5 mb-0">Règles et bonnes pratiques</h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="h6">Qualité des contributions</h4>
+                    <ul class="mb-4">
+                        <li>Vérifiez que le mot n'existe pas déjà dans le dictionnaire</li>
+                        <li>Fournissez une définition claire et précise</li>
+                        <li>Donnez des exemples pertinents et contextuels</li>
+                        <li>Respectez les règles de transcription</li>
+                    </ul>
+
+                    <h4 class="h6">Types de mots</h4>
+                    <ul>
+                        <li><strong>Mots racines :</strong> Mots de base en hassaniya</li>
+                        <li><strong>Mots dérivés :</strong> Variations et formes dérivées des mots racines</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Challenge des 1000 mots -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h3 class="h5 mb-0">Challenge des 1000 mots</h3>
+                </div>
+                <div class="card-body">
+                    <p>Participez à notre challenge pour enrichir le dictionnaire :</p>
+                    <ul>
+                        <li>Objectif : atteindre 1000 mots racines validés</li>
+                        <li>Bonus spéciaux pour les mots racines</li>
+                        <li>Tableau des meilleurs contributeurs</li>
+                        <li>Badges et récompenses spéciales</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Besoin d'aide -->
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="h5 mb-0">Besoin d'aide ?</h3>
+                </div>
+                <div class="card-body">
+                    <p>Si vous avez des questions ou besoin d'assistance :</p>
+                    <ul class="mb-0">
+                        <li>Consultez notre <a href="{% url 'dictionary:transcription_rules' %}">guide de transcription</a></li>
+                        <li>Contactez nos modérateurs</li>
+                        <li>Participez aux discussions sur les mots</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

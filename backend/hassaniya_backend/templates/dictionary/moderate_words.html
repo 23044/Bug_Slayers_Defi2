@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Modération des Mots - Administration{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Modération des Mots</h1>
+                <a href="{% url 'user_list' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-people"></i> Gérer les Utilisateurs
+                </a>
+            </div>
+
+            <!-- Filtres -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Statut</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">Tous</option>
+                                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>En attente</option>
+                                <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approuvés</option>
+                                <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejetés</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="word_type" class="form-label">Type de mot</label>
+                            <select name="word_type" id="word_type" class="form-select">
+                                <option value="">Tous</option>
+                                <option value="root" {% if request.GET.word_type == 'root' %}selected{% endif %}>Mot racine</option>
+                                <option value="derived" {% if request.GET.word_type == 'derived' %}selected{% endif %}>Mot dérivé</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste des mots -->
+            {% for word in words %}
+            <div class="card mb-3 word-card" data-word-id="{{ word.id }}">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-2">
+                                <h4 class="mb-0 me-2">{{ word.word }}</h4>
+                                {% if word.word_type == 'root' %}
+                                <span class="badge bg-info">Mot racine</span>
+                                {% endif %}
+                                <span class="badge {% if word.status == 'pending' %}bg-warning{% elif word.status == 'approved' %}bg-success{% else %}bg-danger{% endif %} ms-2">
+                                    {{ word.get_status_display }}
+                                </span>
+                            </div>
+                            <p class="mb-2">{{ word.definition }}</p>
+                            
+                            {% if word.examples %}
+                            <div class="mb-3">
+                                <h6 class="small fw-bold">Exemples:</h6>
+                                <ul class="small text-secondary mb-0">
+                                    {% for example in word.examples %}
+                                    <li>{{ example }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="small text-muted">
+                                Proposé par {{ word.contributor.username }} le {{ word.created_at|date:"d/m/Y" }}
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center justify-content-end">
+                            {% if word.status == 'pending' %}
+                            <button class="btn btn-success me-2 approve-btn" data-word-id="{{ word.id }}">
+                                <i class="bi bi-check-lg"></i> Approuver
+                            </button>
+                            <button class="btn btn-danger reject-btn" data-word-id="{{ word.id }}">
+                                <i class="bi bi-x-lg"></i> Rejeter
+                            </button>
+                            {% else %}
+                            <button class="btn btn-outline-secondary reset-btn" data-word-id="{{ word.id }}">
+                                <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                Aucun mot à modérer pour le moment.
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.word_type %}&word_type={{ request.GET.word_type }}{% endif %}">&laquo; Précédent</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.word_type %}&word_type={{ request.GET.word_type }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.word_type %}&word_type={{ request.GET.word_type }}{% endif %}">Suivant &raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pour la modération -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fonction pour mettre à jour le statut d'un mot
+    function updateWordStatus(wordId, action) {
+        const url = action === 'approve' 
+            ? `/dictionary/word/${wordId}/approve/`
+            : `/dictionary/word/${wordId}/reject/`;
+            
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const wordCard = document.querySelector(`.word-card[data-word-id="${wordId}"]`);
+                if (wordCard) {
+                    wordCard.remove();
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de la modération du mot.');
+        });
+    }
+
+    // Gestionnaires d'événements pour les boutons
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const wordId = this.dataset.wordId;
+            if (confirm('Êtes-vous sûr de vouloir approuver ce mot ?')) {
+                updateWordStatus(wordId, 'approve');
+            }
+        });
+    });
+
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const wordId = this.dataset.wordId;
+            if (confirm('Êtes-vous sûr de vouloir rejeter ce mot ?')) {
+                updateWordStatus(wordId, 'reject');
+            }
+        });
+    });
+
+    // Fonction pour obtenir le cookie CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %} 

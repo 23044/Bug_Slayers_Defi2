@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Contributeurs - Dictionnaire Hassaniya{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Nos Contributeurs</h1>
+            
+            <!-- Statistiques globales -->
+            <div class="row mb-5">
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total Contributeurs</h5>
+                            <p class="display-4">{{ contributors.count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total Contributions</h5>
+                            <p class="display-4">{{ total_contributions }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Mots Validés</h5>
+                            <p class="display-4">{{ validated_words }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des contributeurs -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rang</th>
+                                    <th>Contributeur</th>
+                                    <th>Contributions</th>
+                                    <th>Mots validés</th>
+                                    <th>Points</th>
+                                    <th>Niveau</th>
+                                    <th>Date d'inscription</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contributor in contributors %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if contributor.profile.avatar %}
+                                            <img src="{{ contributor.profile.avatar.url }}" alt="Avatar" class="rounded-circle me-2" style="width: 32px; height: 32px;">
+                                            {% endif %}
+                                            <div>
+                                                {{ contributor.username }}
+                                                {% if contributor.is_staff %}
+                                                <span class="badge bg-primary ms-1">Staff</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ contributor.profile.words_contributed }}</td>
+                                    <td>{{ contributor.profile.words_validated }}</td>
+                                    <td>{{ contributor.profile.points }}</td>
+                                    <td>
+                                        <span class="badge bg-success">Niveau {{ contributor.profile.level }}</span>
+                                    </td>
+                                    <td>{{ contributor.date_joined|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">Aucun contributeur pour le moment</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Précédent</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant &raquo;</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

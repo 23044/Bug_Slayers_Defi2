@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Barre de recherche et filtres -->
+            <div class="mb-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
+                    <input type="text" id="search-input" class="form-control" placeholder="Rechercher un mot...">
+                </div>
+                <div class="btn-group w-100" role="group">
+                    <button type="button" class="btn btn-outline-secondary active filter-btn" data-filter="all">
+                        Tous <span class="badge bg-secondary ms-1">{{ words|length }}</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-warning filter-btn" data-filter="pending">
+                        En attente <span class="badge bg-warning text-dark ms-1">{{ pending_words|length }}</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger filter-btn" data-filter="rejected">
+                        Rejetés <span class="badge bg-danger ms-1">{{ rejected_words|length }}</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-success filter-btn" data-filter="approved">
+                        Approuvés <span class="badge bg-success ms-1">{{ approved_words|length }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Liste des mots -->
+            <div id="wordsList">
+                {% for word in words %}
+                <div class="card mb-3 word-card" data-status="{{ word.status }}">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4>{{ word.word }}</h4>
+                                <span class="badge {% if word.status == 'approved' %}bg-success{% elif word.status == 'pending' %}bg-warning{% elif word.status == 'rejected' %}bg-danger{% else %}bg-info{% endif %}">
+                                    {{ word.get_status_display }}
+                                </span>
+                                <p class="mt-3">{{ word.definition }}</p>
+                                {% if word.examples %}
+                                <div class="mt-2">
+                                    <strong>Exemples:</strong>
+                                    <ul class="list-unstyled ms-3 mt-2">
+                                        {% for example in word.examples %}
+                                        <li>• {{ example }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                {% if word.status == 'approved' %}
+                                <button class="btn btn-outline-primary btn-sm vote-button" data-word-id="{{ word.id }}">
+                                    <i class="bi bi-star"></i> <span class="vote-count">{{ word.votes.count }}</span>
+                                </button>
+                                {% endif %}
+                                {% if user.is_staff or user.is_superuser %}
+                                    {% if word.status == 'pending' or word.status == 'rejected' %}
+                                    <button class="btn btn-success btn-sm approve-btn" data-word-id="{{ word.id }}">
+                                        <i class="bi bi-check-lg"></i> Approuver
+                                    </button>
+                                    {% endif %}
+                                    {% if word.status == 'pending' %}
+                                    <button class="btn btn-danger btn-sm reject-btn" data-word-id="{{ word.id }}">
+                                        <i class="bi bi-x-lg"></i> Rejeter
+                                    </button>
+                                    {% endif %}
+                                {% endif %}
+                                <div class="mt-3 text-muted small">
+                                    Par: {{ word.contributor.username }}<br>
+                                    {{ word.created_at|date:"d/m/Y" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5" id="noWordsMessage">
+                    <h5>Aucun mot trouvé</h5>
+                    <p class="text-muted">Essayez avec un terme différent ou soumettez un nouveau mot.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des filtres
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const wordCards = document.querySelectorAll('.word-card');
+    const noWordsMessage = document.getElementById('noWordsMessage');
+
+    function updateVisibility(filter) {
+        let visibleCount = 0;
+
+        wordCards.forEach(card => {
+            const status = card.dataset.status;
+            if (filter === 'all' || status === filter) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Afficher/masquer le message "Aucun mot trouvé"
+        noWordsMessage.style.display = visibleCount === 0 ? '' : 'none';
+
+        // Mettre à jour l'état actif des boutons
+        filterButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.filter === filter);
+        });
+    }
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            updateVisibility(filter);
+        });
+    });
+
+    // Recherche en temps réel
+    const searchInput = document.getElementById('search-input');
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+        let visibleCount = 0;
+        
+        wordCards.forEach(card => {
+            const status = card.dataset.status;
+            const word = card.querySelector('h4').textContent.toLowerCase();
+            const definition = card.querySelector('p').textContent.toLowerCase();
+            const examples = Array.from(card.querySelectorAll('.mt-2 li')).map(li => li.textContent.toLowerCase());
+            
+            const matchesSearch = word.includes(searchTerm) || 
+                                definition.includes(searchTerm) || 
+                                examples.some(example => example.includes(searchTerm));
+            const matchesFilter = activeFilter === 'all' || status === activeFilter;
+            
+            if (matchesSearch && matchesFilter) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        noWordsMessage.style.display = visibleCount === 0 ? '' : 'none';
+    });
+
+    // Gestion des votes
+    document.querySelectorAll('.vote-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const wordId = this.dataset.wordId;
+            fetch(`/dictionary/vote/${wordId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.querySelector('.vote-count').textContent = data.votes;
+                }
+            });
+        });
+    });
+
+    // Gestion des actions de modération
+    document.querySelectorAll('.approve-btn, .reject-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const wordId = this.dataset.wordId;
+            const action = this.classList.contains('approve-btn') ? 'approve' : 'reject';
+            
+            fetch(`/dictionary/${action}/${wordId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const wordCard = this.closest('.word-card');
+                    if (wordCard) {
+                        // Mettre à jour le statut de la carte
+                        wordCard.dataset.status = action === 'approve' ? 'approved' : 'rejected';
+                        
+                        // Actualiser l'affichage selon le filtre actif
+                        const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                        updateVisibility(activeFilter);
+                    }
+                }
+            });
+        });
+    });
+
+    // Fonction pour récupérer le cookie CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %} 

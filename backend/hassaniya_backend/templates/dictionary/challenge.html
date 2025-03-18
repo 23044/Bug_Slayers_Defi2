@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Challenge 1000 mots - Dictionnaire Hassaniya{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- En-tête du challenge -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h1 class="display-4 mb-4">{{ challenge.name }}</h1>
+            <p class="lead mb-4">{{ challenge.description }}</p>
+            
+            <!-- Progression globale -->
+            <div class="card bg-light border-0 p-4 mb-4">
+                <h5 class="mb-3">Progression globale</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h2 mb-0 fw-bold text-primary">{{ challenge.get_progress|floatformat:1 }}%</span>
+                    <span class="text-muted">{{ challenge_completed_words }} sur {{ challenge.target_words }} mots</span>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ challenge.get_progress }}%"></div>
+                </div>
+            </div>
+
+            {% if user.is_authenticated %}
+            <!-- Soumettre un mot racine -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Contribuer au challenge</h5>
+                    <p class="card-text text-muted mb-4">
+                        Proposez un mot racine pour enrichir le dictionnaire Hassaniya.
+                    </p>
+                    <form method="post" action="{% url 'dictionary:submit_word' %}">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="word" class="form-label">Mot racine *</label>
+                                <input type="text" class="form-control" id="word" name="word" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="definition" class="form-label">Définition *</label>
+                                <input type="text" class="form-control" id="definition" name="definition" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="examples" class="form-label">Exemples d'utilisation</label>
+                                <textarea class="form-control" id="examples" name="examples" rows="3" placeholder="Un exemple par ligne"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_root_word" name="is_root_word" checked>
+                                    <label class="form-check-label" for="is_root_word">
+                                        Ce mot est un mot racine
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Soumettre le mot</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <h5 class="alert-heading">Envie de participer ?</h5>
+                <p class="mb-0">
+                    <a href="{% url 'login' %}" class="alert-link">Connectez-vous</a> ou 
+                    <a href="{% url 'register' %}" class="alert-link">créez un compte</a> 
+                    pour contribuer au challenge des 1000 mots !
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Classement des contributeurs -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-trophy me-2"></i>
+                        Top Contributeurs
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for contributor in top_contributors %}
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center fw-bold text-primary me-3" style="width: 32px; height: 32px;">
+                                    {{ forloop.counter }}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">{{ contributor.user.username }}</h6>
+                                    <small class="text-muted">
+                                        {{ contributor.points }} points • {{ contributor.words_approved }} mots approuvés
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center text-muted py-4">
+                            Aucun contributeur pour le moment
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mots récemment ajoutés -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Derniers mots ajoutés</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for word in recent_words %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ word.word }}</h6>
+                            <p class="mb-1 small text-muted">{{ word.definition|truncatechars:100 }}</p>
+                            <small class="text-muted">
+                                Par {{ word.contributor.username }} • {{ word.created_at|date:"d/m/Y" }}
+                            </small>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center text-muted py-4">
+                            Aucun mot ajouté récemment
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guide et règles -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Qu'est-ce qu'un mot racine ?
+                    </h5>
+                    <p class="card-text">
+                        Un mot racine en Hassaniya est un mot de base à partir duquel d'autres mots sont formés.
+                        Il représente le concept fondamental et sert de base pour créer des dérivés.
+                    </p>
+                    <a href="{% url 'dictionary:contribution_guide' %}" class="btn btn-outline-primary">
+                        Consulter le guide complet
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Critères de validation
+                    </h5>
+                    <ul class="card-text">
+                        <li>Le mot doit être authentiquement Hassaniya</li>
+                        <li>La définition doit être claire et précise</li>
+                        <li>Les exemples doivent illustrer l'usage courant</li>
+                        <li>Le mot doit être vérifié par la communauté</li>
+                    </ul>
+                    <a href="{% url 'dictionary:transcription_rules' %}" class="btn btn-outline-primary">
+                        Voir les règles de transcription
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

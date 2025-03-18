@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - Dictionnaire Hassaniya{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- En-tête -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">Dictionnaire Collaboratif Hassaniya</h1>
+        <p class="lead text-muted">
+            Contribuez à la préservation et à l'enrichissement de la langue Hassaniya
+        </p>
+        <div class="mt-4">
+            <a href="{% url 'dictionary:home' %}" class="btn btn-primary me-2">
+                <i class="bi bi-book"></i> Consulter le dictionnaire
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'dictionary:submit_word' %}" class="btn btn-success">
+                <i class="bi bi-plus-lg"></i> Ajouter un mot
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Se connecter
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-book text-primary display-4 mb-3"></i>
+                    <h3 class="card-title h2 mb-3">{{ total_words }}</h3>
+                    <p class="card-text text-muted">Mots dans le dictionnaire</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-people text-success display-4 mb-3"></i>
+                    <h3 class="card-title h2 mb-3">{{ total_contributors }}</h3>
+                    <p class="card-text text-muted">Contributeurs actifs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-award text-warning display-4 mb-3"></i>
+                    <h3 class="card-title h2 mb-3">{{ challenge.completed_words }}/1000</h3>
+                    <p class="card-text text-muted">Mots racines documentés</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Challenge et derniers mots -->
+    <div class="row">
+        <!-- Challenge -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-primary h-100">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4">
+                        <i class="bi bi-trophy text-primary me-2"></i>
+                        Challenge des 1000 mots racines
+                    </h2>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Progression</span>
+                            <span class="fw-bold">{{ challenge.progress_percentage|floatformat:1 }}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="width: {{ challenge.progress_percentage }}%"></div>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted mb-4">
+                        Participez au challenge des 1000 mots racines du hassaniya et contribuez à la préservation de la langue !
+                    </p>
+                    <a href="{% url 'dictionary:challenge' %}" class="btn btn-primary">
+                        Participer au challenge
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers mots ajoutés -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Derniers mots ajoutés
+                    </h2>
+                    {% for word in recent_words %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <h3 class="h6 mb-1">{{ word.word }}</h3>
+                        <p class="small text-muted mb-0">{{ word.definition|truncatechars:100 }}</p>
+                        <div class="small text-muted mt-1">
+                            Ajouté par {{ word.contributor.username }} le {{ word.created_at|date:"d/m/Y" }}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Aucun mot n'a encore été ajouté.</p>
+                    {% endfor %}
+                    <a href="{% url 'dictionary:home' %}" class="btn btn-outline-primary">
+                        Voir tous les mots
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
